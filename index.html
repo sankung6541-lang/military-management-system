@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2D5016">
+    <meta name="description" content="ระบบจัดการข้อมูลหน่วยทหาร - Military Unit Management System">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MilitaryMS">
+
+    <title>ระบบจัดการข้อมูลหน่วยทหาร</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="military-emblem">
+                <i class="ph ph-shield-star"></i>
+            </div>
+            <h1>ระบบจัดการข้อมูลหน่วยทหาร</h1>
+            <div class="loading-spinner"></div>
+            <p>กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen hidden">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="military-emblem">
+                    <i class="ph ph-shield-star"></i>
+                </div>
+                <h1>ระบบจัดการข้อมูลหน่วยทหาร</h1>
+                <p>กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form-container" class="login-form-container">
+                <form id="login-form" class="auth-form" onsubmit="event.preventDefault(); auth.handleLogin();">
+                    <div class="form-group">
+                        <label class="form-label">ชื่อผู้ใช้</label>
+                        <div class="input-icon">
+                            <i class="ph ph-user"></i>
+                            <input type="text" id="login-username" class="form-input" placeholder="กรอกชื่อผู้ใช้"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">รหัสผ่าน</label>
+                        <div class="input-icon">
+                            <i class="ph ph-lock"></i>
+                            <input type="password" id="login-password" class="form-input" placeholder="กรอกรหัสผ่าน"
+                                required>
+                        </div>
+                    </div>
+                    <div id="login-error" class="form-error"></div>
+                    <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+                        <i class="ph ph-sign-in"></i>
+                        เข้าสู่ระบบ
+                    </button>
+                </form>
+                <div class="auth-footer">
+                    <p>ยังไม่มีบัญชี? <a href="#" onclick="auth.showRegisterForm()">สมัครสมาชิก</a></p>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form-container" class="login-form-container hidden">
+                <form id="register-form" class="auth-form" onsubmit="event.preventDefault(); auth.handleRegister();">
+                    <div class="form-group">
+                        <label class="form-label">ยศ <span class="required">*</span></label>
+                        <select id="register-rank" class="form-select" required onchange="auth.updateRankType()">
+                            <option value="">เลือกยศ</option>
+                            <optgroup label="นายทหารสัญญาบัตร">
+                                <option value="พล.อ.">พล.อ. (พลเอก)</option>
+                                <option value="พล.ท.">พล.ท. (พลโท)</option>
+                                <option value="พล.ต.">พล.ต. (พลตรี)</option>
+                                <option value="พ.อ.">พ.อ. (พันเอก)</option>
+                                <option value="พ.ท.">พ.ท. (พันโท)</option>
+                                <option value="พ.ต.">พ.ต. (พันตรี)</option>
+                                <option value="ร.อ.">ร.อ. (ร้อยเอก)</option>
+                                <option value="ร.ท.">ร.ท. (ร้อยโท)</option>
+                                <option value="ร.ต.">ร.ต. (ร้อยตรี)</option>
+                            </optgroup>
+                            <optgroup label="นายทหารประทวน">
+                                <option value="จ.ส.อ.">จ.ส.อ. (จ่าสิบเอก)</option>
+                                <option value="จ.ส.ท.">จ.ส.ท. (จ่าสิบโท)</option>
+                                <option value="จ.ส.ต.">จ.ส.ต. (จ่าสิบตรี)</option>
+                                <option value="ส.อ.">ส.อ. (สิบเอก)</option>
+                                <option value="ส.ท.">ส.ท. (สิบโท)</option>
+                                <option value="ส.ต.">ส.ต. (สิบตรี)</option>
+                            </optgroup>
+                            <optgroup label="พลทหาร">
+                                <option value="พลฯ">พลฯ (พลทหาร)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">ชื่อ <span class="required">*</span></label>
+                            <input type="text" id="register-firstname" class="form-input" placeholder="ชื่อจริง"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">นามสกุล <span class="required">*</span></label>
+                            <input type="text" id="register-lastname" class="form-input" placeholder="นามสกุล" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ตำแหน่ง</label>
+                        <input type="text" id="register-position" class="form-input" placeholder="เช่น ผบ.มว., พลขับ">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">ชื่อผู้ใช้ <span class="required">*</span></label>
+                            <input type="text" id="register-username" class="form-input" placeholder="สำหรับเข้าสู่ระบบ"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">รหัสผ่าน <span class="required">*</span></label>
+                            <input type="password" id="register-password" class="form-input"
+                                placeholder="อย่างน้อย 4 ตัว" required>
+                        </div>
+                    </div>
+                    <div id="register-error" class="form-error"></div>
+                    <button type="submit" id="register-btn" class="btn btn-primary btn-block">
+                        <i class="ph ph-user-plus"></i>
+                        สมัครสมาชิก
+                    </button>
+                </form>
+                <div class="auth-footer">
+                    <p>มีบัญชีแล้ว? <a href="#" onclick="auth.showLoginForm()">เข้าสู่ระบบ</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button id="menu-toggle" class="icon-btn" aria-label="เปิดเมนู">
+                    <i class="ph ph-list"></i>
+                </button>
+                <div class="logo">
+                    <i class="ph ph-shield-star"></i>
+                    <span>MilitaryMS</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="sync-btn" class="icon-btn" aria-label="ซิงค์ข้อมูล" title="ซิงค์ข้อมูล">
+                    <i class="ph ph-cloud-arrow-up"></i>
+                </button>
+                <button id="notification-btn" class="icon-btn" aria-label="การแจ้งเตือน">
+                    <i class="ph ph-bell"></i>
+                    <span class="notification-badge hidden">0</span>
+                </button>
+                <!-- Install PWA Button -->
+                <button id="install-btn" class="icon-btn hidden" title="ติดตั้งแอป" onclick="app.installPWA()">
+                    <i class="ph ph-download-simple"></i>
+                </button>
+                <!-- Offline Indicator -->
+                <span id="offline-indicator" class="offline-badge hidden">
+                    <i class="ph ph-wifi-slash"></i> Offline
+                </span>
+                <div class="user-menu">
+                    <button class="user-btn"
+                        onclick="document.querySelector('.user-dropdown').classList.toggle('show')">
+                        <i class="ph ph-user-circle"></i>
+                        <span id="header-username">ผู้ใช้</span>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-info">
+                            <span id="header-user-role">ผู้ใช้งาน</span>
+                        </div>
+                        <button class="dropdown-item" onclick="auth.logout()">
+                            <i class="ph ph-sign-out"></i>
+                            ออกจากระบบ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-overlay"></div>
+            <nav class="sidebar-content">
+                <div class="sidebar-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="ph ph-user-circle"></i>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">ผู้ใช้งาน</span>
+                            <span class="user-role">ผู้ดูแลระบบ</span>
+                        </div>
+                    </div>
+                    <button id="sidebar-close" class="icon-btn">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-page="dashboard">
+                        <i class="ph ph-house"></i>
+                        <span>หน้าแรก</span>
+                    </li>
+                    <li class="nav-item" data-page="soldiers">
+                        <i class="ph ph-users"></i>
+                        <span>กำลังพล</span>
+                    </li>
+                    <li class="nav-item" data-page="attendance">
+                        <i class="ph ph-clock"></i>
+                        <span>ลงเวลา</span>
+                    </li>
+                    <li class="nav-item" data-page="training">
+                        <i class="ph ph-target"></i>
+                        <span>ฝึกอบรม</span>
+                    </li>
+                    <li class="nav-item" data-page="leave">
+                        <i class="ph ph-calendar-check"></i>
+                        <span>การลา</span>
+                    </li>
+                    <li class="nav-item" data-page="equipment">
+                        <i class="ph ph-toolbox"></i>
+                        <span>อุปกรณ์</span>
+                    </li>
+                    <li class="nav-item" data-page="movement">
+                        <i class="ph ph-arrows-left-right"></i>
+                        <span>เข้าออกหน่วย</span>
+                    </li>
+                    <li class="nav-item" data-page="patrol">
+                        <i class="ph ph-shield-checkered"></i>
+                        <span>ตรวจป้อม</span>
+                    </li>
+                    <li class="nav-item" data-page="calendar">
+                        <i class="ph ph-calendar"></i>
+                        <span>ปฏิทิน</span>
+                    </li>
+                    <li class="nav-divider"></li>
+                    <li class="nav-item" data-page="users">
+                        <i class="ph ph-users-three"></i>
+                        <span>จัดการผู้ใช้</span>
+                    </li>
+                    <li class="nav-item" data-page="reports">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>รายงาน</span>
+                    </li>
+                    <li class="nav-item" data-page="settings">
+                        <i class="ph ph-gear"></i>
+                        <span>ตั้งค่า</span>
+                    </li>
+                </ul>
+
+                <div class="sidebar-footer">
+                    <div class="sync-status">
+                        <i class="ph ph-cloud-check"></i>
+                        <span>ข้อมูลอัพเดทล่าสุด</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <section id="page-dashboard" class="page active">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-house"></i>
+                        หน้าแรก
+                    </h1>
+                    <p class="page-subtitle">ภาพรวมข้อมูลหน่วย</p>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon soldiers">
+                            <i class="ph ph-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-soldiers">0</span>
+                            <span class="stat-label">กำลังพลทั้งหมด</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon attendance">
+                            <i class="ph ph-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-present">0</span>
+                            <span class="stat-label">มาปฏิบัติงานวันนี้</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon leave">
+                            <i class="ph ph-calendar-x"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-leave">0</span>
+                            <span class="stat-label">ลาวันนี้</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon training">
+                            <i class="ph ph-target"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-training">0</span>
+                            <span class="stat-label">กำลังฝึก</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="section">
+                    <h2 class="section-title">
+                        <i class="ph ph-chart-pie"></i>
+                        สถิติและกราฟ
+                    </h2>
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3 class="chart-title">กำลังพลตามสถานะ</h3>
+                            <div class="chart-container">
+                                <canvas id="chart-status"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3 class="chart-title">กำลังพลตามชั้นยศ</h3>
+                            <div class="chart-container">
+                                <canvas id="chart-rank"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3 class="chart-title">การเข้างาน 7 วันล่าสุด</h3>
+                            <div class="chart-container chart-bar">
+                                <canvas id="chart-attendance"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3 class="chart-title">การลาตามประเภท</h3>
+                            <div class="chart-container">
+                                <canvas id="chart-leave"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="section">
+                    <h2 class="section-title">
+                        <i class="ph ph-lightning"></i>
+                        การดำเนินการด่วน
+                    </h2>
+                    <div class="quick-actions">
+                        <button class="action-btn" onclick="app.navigateTo('attendance'); attendance.showCheckIn();">
+                            <i class="ph ph-sign-in"></i>
+                            <span>ลงเวลาเข้า</span>
+                        </button>
+                        <button class="action-btn" onclick="app.navigateTo('attendance'); attendance.showCheckOut();">
+                            <i class="ph ph-sign-out"></i>
+                            <span>ลงเวลาออก</span>
+                        </button>
+                        <button class="action-btn" onclick="app.navigateTo('soldiers'); soldiers.showAddForm();">
+                            <i class="ph ph-user-plus"></i>
+                            <span>เพิ่มกำลังพล</span>
+                        </button>
+                        <button class="action-btn" onclick="app.navigateTo('leave'); leave.showAddForm();">
+                            <i class="ph ph-calendar-plus"></i>
+                            <span>ยื่นใบลา</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activities & Pending Items -->
+                <div class="dashboard-grid">
+                    <div class="section">
+                        <h2 class="section-title">
+                            <i class="ph ph-clock-countdown"></i>
+                            รอดำเนินการ
+                        </h2>
+                        <div class="pending-list" id="pending-list">
+                            <div class="empty-state">
+                                <i class="ph ph-check-circle"></i>
+                                <p>ไม่มีรายการรอดำเนินการ</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">
+                            <i class="ph ph-activity"></i>
+                            กิจกรรมล่าสุด
+                        </h2>
+                        <div class="activity-list" id="activity-list">
+                            <div class="empty-state">
+                                <i class="ph ph-note-blank"></i>
+                                <p>ยังไม่มีกิจกรรม</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Soldiers Page -->
+            <section id="page-soldiers" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-users"></i>
+                        กำลังพล
+                    </h1>
+                    <button class="btn btn-primary" onclick="soldiers.showAddForm()">
+                        <i class="ph ph-user-plus"></i>
+                        เพิ่มกำลังพล
+                    </button>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="search-filter">
+                    <div class="search-box">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="soldier-search" placeholder="ค้นหาชื่อ, รหัส, ยศ...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="soldier-filter-rank" class="filter-select">
+                            <option value="">ยศทั้งหมด</option>
+                        </select>
+                        <select id="soldier-filter-unit" class="filter-select">
+                            <option value="">หน่วยทั้งหมด</option>
+                        </select>
+                        <select id="soldier-filter-status" class="filter-select">
+                            <option value="">สถานะทั้งหมด</option>
+                            <option value="active">ประจำการ</option>
+                            <option value="leave">ลา</option>
+                            <option value="training">ฝึก</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Soldiers List -->
+                <div class="data-table-container">
+                    <table class="data-table" id="soldiers-table">
+                        <thead>
+                            <tr>
+                                <th>รหัส</th>
+                                <th>ยศ-ชื่อ</th>
+                                <th>ตำแหน่ง</th>
+                                <th>หน่วย</th>
+                                <th>สถานะ</th>
+                                <th>การดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="soldiers-tbody">
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div class="cards-container" id="soldiers-cards">
+                    <!-- Cards will be loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Attendance Page -->
+            <section id="page-attendance" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-clock"></i>
+                        ลงเวลา
+                    </h1>
+                    <div class="header-actions">
+                        <button class="btn btn-success" onclick="attendance.showCheckIn()">
+                            <i class="ph ph-sign-in"></i>
+                            ลงเวลาเข้า
+                        </button>
+                        <button class="btn btn-warning" onclick="attendance.showCheckOut()">
+                            <i class="ph ph-sign-out"></i>
+                            ลงเวลาออก
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Date Selector -->
+                <div class="date-selector">
+                    <button class="btn btn-icon" onclick="attendance.prevDay()">
+                        <i class="ph ph-caret-left"></i>
+                    </button>
+                    <input type="date" id="attendance-date" class="date-input">
+                    <button class="btn btn-icon" onclick="attendance.nextDay()">
+                        <i class="ph ph-caret-right"></i>
+                    </button>
+                    <button class="btn btn-outline" onclick="attendance.goToday()">
+                        วันนี้
+                    </button>
+                </div>
+
+                <!-- Attendance Summary -->
+                <div class="attendance-summary">
+                    <div class="summary-item present">
+                        <i class="ph ph-check-circle"></i>
+                        <span class="summary-value" id="att-present">0</span>
+                        <span class="summary-label">มา</span>
+                    </div>
+                    <div class="summary-item late">
+                        <i class="ph ph-warning-circle"></i>
+                        <span class="summary-value" id="att-late">0</span>
+                        <span class="summary-label">สาย</span>
+                    </div>
+                    <div class="summary-item absent">
+                        <i class="ph ph-x-circle"></i>
+                        <span class="summary-value" id="att-absent">0</span>
+                        <span class="summary-label">ขาด</span>
+                    </div>
+                    <div class="summary-item leave">
+                        <i class="ph ph-calendar-x"></i>
+                        <span class="summary-value" id="att-leave">0</span>
+                        <span class="summary-label">ลา</span>
+                    </div>
+                </div>
+
+                <!-- Attendance Table -->
+                <div class="data-table-container">
+                    <table class="data-table" id="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>รหัส</th>
+                                <th>ยศ-ชื่อ</th>
+                                <th>เวลาเข้า</th>
+                                <th>เวลาออก</th>
+                                <th>สถานะ</th>
+                                <th>หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-tbody">
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div class="cards-container" id="attendance-cards">
+                    <!-- Cards will be loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Training Page -->
+            <section id="page-training" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-target"></i>
+                        ฝึกอบรม
+                    </h1>
+                    <button class="btn btn-primary" onclick="training.showAddForm()">
+                        <i class="ph ph-plus"></i>
+                        เพิ่มการฝึก
+                    </button>
+                </div>
+
+                <!-- Training Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="ongoing">
+                        <i class="ph ph-spinner"></i>
+                        กำลังดำเนินการ
+                    </button>
+                    <button class="tab" data-tab="upcoming">
+                        <i class="ph ph-calendar"></i>
+                        กำหนดการ
+                    </button>
+                    <button class="tab" data-tab="completed">
+                        <i class="ph ph-check"></i>
+                        เสร็จสิ้น
+                    </button>
+                </div>
+
+                <!-- Training List -->
+                <div class="training-list" id="training-list">
+                    <!-- Training cards will be loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Leave Page -->
+            <section id="page-leave" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-calendar-check"></i>
+                        การลา
+                    </h1>
+                    <button class="btn btn-primary" onclick="leave.showAddForm()">
+                        <i class="ph ph-plus"></i>
+                        ยื่นใบลา
+                    </button>
+                </div>
+
+                <!-- Leave Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="pending">
+                        <i class="ph ph-hourglass"></i>
+                        รออนุมัติ
+                        <span class="tab-badge" id="leave-pending-count">0</span>
+                    </button>
+                    <button class="tab" data-tab="approved">
+                        <i class="ph ph-check-circle"></i>
+                        อนุมัติแล้ว
+                    </button>
+                    <button class="tab" data-tab="rejected">
+                        <i class="ph ph-x-circle"></i>
+                        ไม่อนุมัติ
+                    </button>
+                    <button class="tab" data-tab="all">
+                        <i class="ph ph-list"></i>
+                        ทั้งหมด
+                    </button>
+                </div>
+
+                <!-- Leave List -->
+                <div class="leave-list" id="leave-list">
+                    <!-- Leave cards will be loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Equipment Page -->
+            <section id="page-equipment" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-toolbox"></i>
+                        อุปกรณ์
+                    </h1>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="equipment.showAddForm()">
+                            <i class="ph ph-plus"></i>
+                            เพิ่มอุปกรณ์
+                        </button>
+                        <button class="btn btn-outline" onclick="equipment.showBorrowForm()">
+                            <i class="ph ph-arrow-right"></i>
+                            เบิก/คืน
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Equipment Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="inventory">
+                        <i class="ph ph-warehouse"></i>
+                        คลังอุปกรณ์
+                    </button>
+                    <button class="tab" data-tab="borrowed">
+                        <i class="ph ph-arrow-circle-right"></i>
+                        ที่เบิกไป
+                    </button>
+                    <button class="tab" data-tab="history">
+                        <i class="ph ph-clock-counter-clockwise"></i>
+                        ประวัติ
+                    </button>
+                </div>
+
+                <!-- Equipment Grid -->
+                <div class="equipment-grid" id="equipment-grid">
+                    <!-- Equipment cards will be loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Movement Page - บันทึกการเข้าออกหน่วย -->
+            <section id="page-movement" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-arrows-left-right"></i>
+                        เข้าออกหน่วย
+                    </h1>
+                    <button class="btn btn-primary" onclick="personnelMovement.showAddForm()">
+                        <i class="ph ph-plus"></i>
+                        บันทึกใหม่
+                    </button>
+                </div>
+
+                <!-- Movement Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #22C55E, #16A34A);">
+                            <i class="ph ph-sign-in"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-movement-in">0</span>
+                            <span class="stat-label">เข้าหน่วยวันนี้</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                            <i class="ph ph-sign-out"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-movement-out">0</span>
+                            <span class="stat-label">ออกหน่วยวันนี้</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #6366F1, #4F46E5);">
+                            <i class="ph ph-moon"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-movement-night">0</span>
+                            <span class="stat-label">กลางคืน</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+                            <i class="ph ph-list-numbers"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-movement-total">0</span>
+                            <span class="stat-label">ทั้งหมด</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movement Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="all">
+                        <i class="ph ph-list"></i>
+                        ทั้งหมด
+                    </button>
+                    <button class="tab" data-tab="in">
+                        <i class="ph ph-sign-in"></i>
+                        เข้าหน่วย
+                    </button>
+                    <button class="tab" data-tab="out">
+                        <i class="ph ph-sign-out"></i>
+                        ออกหน่วย
+                    </button>
+                    <button class="tab" data-tab="night">
+                        <i class="ph ph-moon"></i>
+                        กลางคืน
+                    </button>
+                </div>
+
+                <!-- Movement Filters -->
+                <div class="filter-row">
+                    <div class="date-range">
+                        <input type="date" id="movement-start-date" class="date-input">
+                        <span>ถึง</span>
+                        <input type="date" id="movement-end-date" class="date-input">
+                    </div>
+                    <select id="movement-filter-type" class="filter-select">
+                        <option value="">ประเภททั้งหมด</option>
+                        <option value="dispatch">ไปราชการ</option>
+                        <option value="return_duty">กลับจากราชการ</option>
+                        <option value="transfer_out">ย้ายออก</option>
+                        <option value="transfer_in">ย้ายเข้า</option>
+                        <option value="resign">ลาออก</option>
+                        <option value="retire">เกษียณ</option>
+                        <option value="night_exit">ออกกลางคืน</option>
+                        <option value="night_entry">เข้ากลางคืน</option>
+                        <option value="other">อื่นๆ</option>
+                    </select>
+                </div>
+
+                <!-- Movement List -->
+                <div class="movement-list" id="movement-list">
+                    <div class="empty-state">
+                        <i class="ph ph-signpost"></i>
+                        <p>ไม่มีบันทึกการเข้าออกหน่วย</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Guard Patrol Page - รายงานเวรตรวจจุดป้อม -->
+            <section id="page-patrol" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-shield-checkered"></i>
+                        ตรวจป้อม
+                    </h1>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="guardPatrol.exportPDF()">
+                            <i class="ph ph-file-pdf"></i>
+                            <span>รายงาน PDF</span>
+                        </button>
+                        <button class="btn btn-outline" onclick="guardPatrol.showQuickPatrol()">
+                            <i class="ph ph-lightning"></i>
+                            ตรวจหลายจุด
+                        </button>
+                        <button class="btn btn-primary" onclick="guardPatrol.showAddForm()">
+                            <i class="ph ph-plus"></i>
+                            บันทึกการตรวจ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Date Selector -->
+                <div class="date-selector">
+                    <button class="btn btn-icon" onclick="guardPatrol.prevDay && guardPatrol.prevDay()">
+                        <i class="ph ph-caret-left"></i>
+                    </button>
+                    <input type="date" id="patrol-date" class="date-input">
+                    <button class="btn btn-icon" onclick="guardPatrol.nextDay && guardPatrol.nextDay()">
+                        <i class="ph ph-caret-right"></i>
+                    </button>
+                    <button class="btn btn-outline"
+                        onclick="document.getElementById('patrol-date').valueAsDate = new Date(); guardPatrol.selectedDate = new Date().toISOString().split('T')[0]; guardPatrol.render();">
+                        วันนี้
+                    </button>
+                </div>
+
+                <!-- Patrol Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #22C55E, #16A34A);">
+                            <i class="ph ph-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-patrol-checked">0</span>
+                            <span class="stat-label">จุดที่ตรวจแล้ว</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                            <i class="ph ph-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-patrol-remaining">0</span>
+                            <span class="stat-label">ยังไม่ได้ตรวจ</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #EF4444, #DC2626);">
+                            <i class="ph ph-warning"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-patrol-issues">0</span>
+                            <span class="stat-label">พบปัญหา</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+                            <i class="ph ph-list-numbers"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-patrol-total">0</span>
+                            <span class="stat-label">บันทึกทั้งหมด</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="patrol-progress-container">
+                    <div class="patrol-progress-header">
+                        <span>ความคืบหน้าการตรวจ</span>
+                        <span id="patrol-percent">0%</span>
+                    </div>
+                    <div class="patrol-progress-bar">
+                        <div class="patrol-progress" id="patrol-progress" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Patrol Records -->
+                <div class="section">
+                    <h2 class="section-title">
+                        <i class="ph ph-list-checks"></i>
+                        บันทึกการตรวจวันนี้
+                    </h2>
+                    <div class="patrol-list" id="patrol-list">
+                        <div class="empty-state">
+                            <i class="ph ph-shield-warning"></i>
+                            <p>ยังไม่มีบันทึกการตรวจ</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar Page -->
+            <section id="page-calendar" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-calendar"></i>
+                        ปฏิทินกิจกรรม
+                    </h1>
+                </div>
+
+                <!-- Month Navigation -->
+                <div class="calendar-nav">
+                    <button class="btn btn-icon" onclick="calendar.prevMonth()">
+                        <i class="ph ph-caret-left"></i>
+                    </button>
+                    <h2 class="calendar-month" id="calendar-month"></h2>
+                    <button class="btn btn-icon" onclick="calendar.nextMonth()">
+                        <i class="ph ph-caret-right"></i>
+                    </button>
+                    <button class="btn btn-outline" onclick="calendar.goToday()">วันนี้</button>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-weekday">อา</div>
+                        <div class="calendar-weekday">จ</div>
+                        <div class="calendar-weekday">อ</div>
+                        <div class="calendar-weekday">พ</div>
+                        <div class="calendar-weekday">พฤ</div>
+                        <div class="calendar-weekday">ศ</div>
+                        <div class="calendar-weekday">ส</div>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Days will be rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #ef4444;"></span>
+                        <span>การลา</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #3b82f6;"></span>
+                        <span>ฝึกอบรม</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #22c55e;"></span>
+                        <span>เวรยาม</span>
+                    </div>
+                </div>
+
+                <!-- Day Events -->
+                <div class="section">
+                    <h2 class="section-title" id="calendar-selected-date">
+                        <i class="ph ph-list-bullets"></i>
+                        กิจกรรมวันที่เลือก
+                    </h2>
+                    <div id="calendar-events" class="calendar-events">
+                        <div class="empty-state">
+                            <i class="ph ph-calendar-blank"></i>
+                            <p>เลือกวันในปฏิทินเพื่อดูกิจกรรม</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Page -->
+            <section id="page-reports" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-chart-bar"></i>
+                        รายงาน
+                    </h1>
+                    <button class="btn btn-outline" onclick="reports.exportReport()">
+                        <i class="ph ph-download"></i>
+                        ส่งออก
+                    </button>
+                </div>
+
+                <!-- Report Type Selector -->
+                <div class="report-selector">
+                    <select id="report-type" class="filter-select">
+                        <option value="attendance">รายงานการลงเวลา</option>
+                        <option value="leave">รายงานการลา</option>
+                        <option value="training">รายงานการฝึก</option>
+                        <option value="equipment">รายงานอุปกรณ์</option>
+                    </select>
+                    <div class="date-range">
+                        <input type="date" id="report-start" class="date-input">
+                        <span>ถึง</span>
+                        <input type="date" id="report-end" class="date-input">
+                    </div>
+                    <button class="btn btn-primary" onclick="reports.generate()">
+                        <i class="ph ph-chart-line"></i>
+                        สร้างรายงาน
+                    </button>
+                </div>
+
+                <!-- Report Content -->
+                <div class="report-content" id="report-content">
+                    <div class="empty-state">
+                        <i class="ph ph-chart-pie"></i>
+                        <p>เลือกประเภทรายงานและช่วงเวลา</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Page - จัดการผู้ใช้ (Admin Only) -->
+            <section id="page-users" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-users-three"></i>
+                        จัดการผู้ใช้
+                    </h1>
+                </div>
+
+                <div class="users-container">
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">รายชื่อผู้ใช้งาน</h2>
+                        </div>
+                        <div id="users-list" class="users-list">
+                            <!-- Users will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Page -->
+            <section id="page-settings" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="ph ph-gear"></i>
+                        ตั้งค่า
+                    </h1>
+                </div>
+
+                <div class="settings-list">
+                    <!-- Google Sheets Settings -->
+                    <div class="settings-group">
+                        <h2 class="settings-group-title">
+                            <i class="ph ph-google-logo"></i>
+                            การเชื่อมต่อ Google Sheets
+                        </h2>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">URL ของ Google Apps Script</span>
+                                <span class="setting-desc">ใส่ URL ของ Web App ที่ deploy แล้ว</span>
+                            </div>
+                            <input type="url" id="setting-api-url" class="setting-input"
+                                placeholder="https://script.google.com/...">
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">สถานะการเชื่อมต่อ</span>
+                            </div>
+                            <div class="connection-status" id="connection-status">
+                                <i class="ph ph-cloud-slash"></i>
+                                <span>ยังไม่เชื่อมต่อ</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="settings.testConnection()">
+                            <i class="ph ph-plugs-connected"></i>
+                            ทดสอบการเชื่อมต่อ
+                        </button>
+                    </div>
+
+                    <!-- Sync by Category - ซิงค์แยกหมวดหมู่ -->
+                    <div class="settings-group">
+                        <h2 class="settings-group-title">
+                            <i class="ph ph-cloud-arrow-up"></i>
+                            ซิงค์ข้อมูลไป Google Sheets
+                        </h2>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">ซิงค์ทั้งหมด</span>
+                                <span class="setting-desc">บันทึกข้อมูลทุกหมวดหมู่ไป Google Sheets</span>
+                            </div>
+                            <button class="btn btn-primary" onclick="api.syncAll()">
+                                <i class="ph ph-cloud-arrow-up"></i>
+                                ซิงค์ทั้งหมด
+                            </button>
+                        </div>
+
+                        <div class="sync-categories-grid" id="sync-categories">
+                            <!-- กำลังพล -->
+                            <div class="sync-category-item">
+                                <div class="sync-category-info">
+                                    <i class="ph ph-users"></i>
+                                    <div class="sync-category-text">
+                                        <span class="sync-category-name">กำลังพล</span>
+                                        <span class="sync-category-count" id="sync-count-soldiers">0 รายการ</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="api.syncCategory('SOLDIERS')">
+                                    <i class="ph ph-arrow-up"></i>
+                                    ซิงค์
+                                </button>
+                            </div>
+
+                            <!-- ลงเวลา -->
+                            <div class="sync-category-item">
+                                <div class="sync-category-info">
+                                    <i class="ph ph-clock"></i>
+                                    <div class="sync-category-text">
+                                        <span class="sync-category-name">ลงเวลา</span>
+                                        <span class="sync-category-count" id="sync-count-attendance">0 รายการ</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="api.syncCategory('ATTENDANCE')">
+                                    <i class="ph ph-arrow-up"></i>
+                                    ซิงค์
+                                </button>
+                            </div>
+
+                            <!-- ฝึกอบรม -->
+                            <div class="sync-category-item">
+                                <div class="sync-category-info">
+                                    <i class="ph ph-target"></i>
+                                    <div class="sync-category-text">
+                                        <span class="sync-category-name">ฝึกอบรม</span>
+                                        <span class="sync-category-count" id="sync-count-training">0 รายการ</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="api.syncCategory('TRAINING')">
+                                    <i class="ph ph-arrow-up"></i>
+                                    ซิงค์
+                                </button>
+                            </div>
+
+                            <!-- การลา -->
+                            <div class="sync-category-item">
+                                <div class="sync-category-info">
+                                    <i class="ph ph-calendar-check"></i>
+                                    <div class="sync-category-text">
+                                        <span class="sync-category-name">การลา</span>
+                                        <span class="sync-category-count" id="sync-count-leave">0 รายการ</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="api.syncCategory('LEAVE')">
+                                    <i class="ph ph-arrow-up"></i>
+                                    ซิงค์
+                                </button>
+                            </div>
+
+                            <!-- อุปกรณ์ -->
+                            <div class="sync-category-item">
+                                <div class="sync-category-info">
+                                    <i class="ph ph-toolbox"></i>
+                                    <div class="sync-category-text">
+                                        <span class="sync-category-name">อุปกรณ์</span>
+                                        <span class="sync-category-count" id="sync-count-equipment">0 รายการ</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="api.syncCategory('EQUIPMENT')">
+                                    <i class="ph ph-arrow-up"></i>
+                                    ซิงค์
+                                </button>
+                            </div>
+
+                            <!-- เข้าออกหน่วย -->
+                            <div class="sync-category-item">
+                                <div class="sync-category-info">
+                                    <i class="ph ph-arrows-left-right"></i>
+                                    <div class="sync-category-text">
+                                        <span class="sync-category-name">เข้าออกหน่วย</span>
+                                        <span class="sync-category-count" id="sync-count-movement">0 รายการ</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="api.syncCategory('MOVEMENT')">
+                                    <i class="ph ph-arrow-up"></i>
+                                    ซิงค์
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="setting-item" id="last-sync-info">
+                            <div class="setting-info">
+                                <span class="setting-label">ซิงค์ล่าสุด</span>
+                                <span class="setting-desc" id="last-sync-time">ยังไม่เคยซิงค์</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unit Settings -->
+                    <div class="settings-group">
+                        <h2 class="settings-group-title">
+                            <i class="ph ph-buildings"></i>
+                            ข้อมูลหน่วย
+                        </h2>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">ชื่อหน่วย</span>
+                            </div>
+                            <input type="text" id="setting-unit-name" class="setting-input" placeholder="กรอกชื่อหน่วย">
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">เวลาเข้างาน</span>
+                            </div>
+                            <input type="time" id="setting-work-start" class="setting-input" value="08:00">
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">เวลาเลิกงาน</span>
+                            </div>
+                            <input type="time" id="setting-work-end" class="setting-input" value="16:30">
+                        </div>
+                    </div>
+
+                    <!-- Notification Settings (LINE Messaging API) -->
+                    <div class="settings-group">
+                        <h2 class="settings-group-title">
+                            <i class="ph ph-bell"></i>
+                            การแจ้งเตือน (LINE OA)
+                        </h2>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Channel Access Token</span>
+                                <span class="setting-desc">รหัสยาวๆ จาก LINE Developers Console</span>
+                            </div>
+                            <input type="password" id="setting-line-channel-token" class="setting-input"
+                                placeholder="ใส่ Channel Access Token">
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">User ID / Group ID</span>
+                                <span class="setting-desc">รหัสผู้ใช้ หรือรหัสกลุ่มที่จะให้ส่งข้อความถึง</span>
+                            </div>
+                            <input type="text" id="setting-line-dest-id" class="setting-input"
+                                placeholder="Uxxxxxxxx... หรือ Cxxxxxxxx...">
+                        </div>
+                        <div class="setting-actions">
+                            <button class="btn btn-outline"
+                                onclick="window.open('https://developers.line.biz/console/', '_blank')">
+                                <i class="ph ph-wrench"></i>
+                                LINE Developers
+                            </button>
+                            <button class="btn btn-primary" onclick="settings.testLineMessage()">
+                                <i class="ph ph-paper-plane-right"></i>
+                                ทดสอบส่งข้อความ
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="settings-group">
+                        <h2 class="settings-group-title">
+                            <i class="ph ph-database"></i>
+                            จัดการข้อมูล
+                        </h2>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">ส่งออกข้อมูลทั้งหมด</span>
+                                <span class="setting-desc">ดาวน์โหลดข้อมูลเป็นไฟล์ JSON</span>
+                            </div>
+                            <button class="btn btn-outline" onclick="settings.exportData()">
+                                <i class="ph ph-download"></i>
+                                ส่งออก
+                            </button>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">นำเข้าข้อมูล</span>
+                                <span class="setting-desc">นำเข้าข้อมูลจากไฟล์ JSON</span>
+                            </div>
+                            <button class="btn btn-outline" onclick="settings.importData()">
+                                <i class="ph ph-upload"></i>
+                                นำเข้า
+                            </button>
+                        </div>
+                        <div class="setting-item danger">
+                            <div class="setting-info">
+                                <span class="setting-label">ล้างข้อมูลทั้งหมด</span>
+                                <span class="setting-desc">ลบข้อมูลทั้งหมดในเครื่อง</span>
+                            </div>
+                            <button class="btn btn-danger" onclick="settings.clearData()">
+                                <i class="ph ph-trash"></i>
+                                ล้างข้อมูล
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- About -->
+                    <div class="settings-group">
+                        <h2 class="settings-group-title">
+                            <i class="ph ph-info"></i>
+                            เกี่ยวกับ
+                        </h2>
+                        <div class="about-info">
+                            <p><strong>ระบบจัดการข้อมูลหน่วยทหาร</strong></p>
+                            <p>เวอร์ชัน 1.0.0</p>
+                            <p>พัฒนาโดย: Military Unit Team</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" data-page="dashboard">
+                <i class="ph ph-house"></i>
+                <span>หน้าแรก</span>
+            </button>
+            <button class="bottom-nav-item" data-page="soldiers">
+                <i class="ph ph-users"></i>
+                <span>กำลังพล</span>
+            </button>
+            <button class="bottom-nav-item" data-page="attendance">
+                <i class="ph ph-clock"></i>
+                <span>ลงเวลา</span>
+            </button>
+            <button class="bottom-nav-item" data-page="leave">
+                <i class="ph ph-calendar-check"></i>
+                <span>การลา</span>
+            </button>
+            <button class="bottom-nav-item" data-page="equipment">
+                <i class="ph ph-toolbox"></i>
+                <span>อุปกรณ์</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="modal-container hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">หัวข้อ</h2>
+                <button class="icon-btn" onclick="app.closeModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Modal content will be injected here -->
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <!-- Modal buttons will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/soldiers.js"></script>
+    <script src="js/attendance.js"></script>
+    <script src="js/training.js"></script>
+    <script src="js/leave.js"></script>
+    <script src="js/equipment.js"></script>
+    <script src="js/personnel-movement.js"></script>
+    <script src="js/guard-patrol.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/reports.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
