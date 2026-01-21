@@ -55,6 +55,21 @@ function doGet(e) {
     });
   }
   
+  // Get all users from Sheets (for admin sync)
+  if (action === 'getUsers') {
+    var users = getSheetData('ผู้ใช้งาน').map(function(u) {
+      // Don't send password back for security
+      return {
+        id: u.id,
+        username: u.username,
+        displayName: u.displayName,
+        role: u.role || 'user',
+        createdAt: u.createdAt
+      };
+    });
+    return jsonResponse({ success: true, data: users });
+  }
+  
   return jsonResponse({ success: true, message: 'Ready' });
 }
 
@@ -127,6 +142,19 @@ function doPost(e) {
           return jsonResponse({ success: false, error: 'ชื่อผู้ใช้นี้มีอยู่แล้ว' });
         }
         addRow('ผู้ใช้งาน', data);
+        return jsonResponse({ success: true });
+      
+      // ========== User Management ==========
+      case 'syncUsers':
+        syncSheet('ผู้ใช้งาน', data.users);
+        return jsonResponse({ success: true, count: data.users ? data.users.length : 0, sheet: 'ผู้ใช้งาน' });
+        
+      case 'updateUser':
+        updateRow('ผู้ใช้งาน', data.user);
+        return jsonResponse({ success: true });
+        
+      case 'deleteUserById':
+        deleteRow('ผู้ใช้งาน', data.id);
         return jsonResponse({ success: true });
       
       // ========== SYNC Category (Clear & Replace) ==========

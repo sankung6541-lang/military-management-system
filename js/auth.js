@@ -389,6 +389,97 @@ const auth = {
     // ==========================================
 
     /**
+     * Sync users from Google Sheets to Local Storage
+     * ดึงข้อมูลผู้ใช้จาก Sheets มาอัพเดท Local
+     */
+    async syncUsersFromSheets() {
+        if (!this.isAdmin()) {
+            app.showToast('error', 'ไม่มีสิทธิ์', 'เฉพาะผู้ดูแลระบบเท่านั้น');
+            return false;
+        }
+
+        const settings = storage.getSettings();
+        if (!settings.apiUrl) {
+            app.showToast('warning', 'ไม่ได้เชื่อมต่อ', 'กรุณาตั้งค่า Google Sheets API URL ก่อน');
+            return false;
+        }
+
+        try {
+            app.showToast('info', 'กำลังดึงข้อมูล...', 'โปรดรอสักครู่');
+
+            // Fetch users from Sheets via GET
+            const response = await fetch(`${settings.apiUrl}?action=getUsers`);
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                // Merge with local users (keep passwords from local)
+                const localUsers = this.getLocalUsers();
+                const mergedUsers = result.data.map(sheetUser => {
+                    const localUser = localUsers.find(u => u.id === sheetUser.id || u.username === sheetUser.username);
+                    return {
+                        id: sheetUser.id,
+                        username: sheetUser.username,
+                        password: localUser?.password || '', // Keep local password
+                        displayName: sheetUser.displayName,
+                        role: sheetUser.role || 'user',
+                        createdAt: sheetUser.createdAt || localUser?.createdAt || new Date().toISOString()
+                    };
+                });
+
+                // Save merged users to local
+                this.saveLocalUsers(mergedUsers);
+
+                app.showToast('success', 'ดึงข้อมูลสำเร็จ', `พบผู้ใช้ ${mergedUsers.length} คน`);
+                this.renderUserManagement();
+                return true;
+            } else {
+                app.showToast('error', 'ไม่สามารถดึงข้อมูล', result.error || 'เกิดข้อผิดพลาด');
+                return false;
+            }
+        } catch (error) {
+            console.error('Sync users from sheets error:', error);
+            app.showToast('error', 'เกิดข้อผิดพลาด', error.message);
+            return false;
+        }
+    },
+
+    /**
+     * Sync users from Local Storage to Google Sheets
+     * อัพโหลดข้อมูลผู้ใช้ไป Sheets
+     */
+    async syncUsersToSheets() {
+        if (!this.isAdmin()) {
+            app.showToast('error', 'ไม่มีสิทธิ์', 'เฉพาะผู้ดูแลระบบเท่านั้น');
+            return false;
+        }
+
+        const settings = storage.getSettings();
+        if (!settings.apiUrl) {
+            app.showToast('warning', 'ไม่ได้เชื่อมต่อ', 'กรุณาตั้งค่า Google Sheets API URL ก่อน');
+            return false;
+        }
+
+        try {
+            app.showToast('info', 'กำลังซิงค์...', 'โปรดรอสักครู่');
+
+            const users = this.getLocalUsers();
+            const result = await api.submitViaForm('syncUsers', { users });
+
+            if (result.success) {
+                app.showToast('success', 'ซิงค์สำเร็จ', `อัพโหลดผู้ใช้ ${users.length} คน`);
+                return true;
+            } else {
+                app.showToast('error', 'ซิงค์ไม่สำเร็จ', result.error || 'เกิดข้อผิดพลาด');
+                return false;
+            }
+        } catch (error) {
+            console.error('Sync users to sheets error:', error);
+            app.showToast('error', 'เกิดข้อผิดพลาด', error.message);
+            return false;
+        }
+    },
+
+    /**
      * Get all users (admin only)
      */
     getAllUsers() {
@@ -554,11 +645,16 @@ const auth = {
         const users = this.getAllUsers();
         const currentUserId = this.getCurrentUserId();
 
+        // Update users count badge
+        const countEl = document.getElementById('users-count');
+        if (countEl) countEl.textContent = `${users.length} คน`;
+
         if (users.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="ph ph-users"></i>
                     <p>ยังไม่มีผู้ใช้ในระบบ</p>
+                    <p style="font-size: 0.875rem; color: var(--text-muted);">ลองกด "ดึงจาก Sheets" เพื่อโหลดผู้ใช้จาก Google Sheets</p>
                 </div>
             `;
             return;

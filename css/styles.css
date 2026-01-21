@@ -3286,3 +3286,612 @@ img {
 .pwa-installed-toast {
     background: linear-gradient(135deg, var(--color-success), #059669);
 }
+
+/* =====================================================
+   Enhanced Responsive Design - Mobile First
+   ===================================================== */
+
+/* ----- Extra Small Devices (phones, 320px - 480px) ----- */
+@media (max-width: 480px) {
+
+    /* Header adjustments */
+    .header {
+        padding: 0 var(--spacing-sm);
+    }
+
+    .logo span {
+        display: none;
+    }
+
+    .header-right {
+        gap: var(--spacing-xs);
+    }
+
+    .user-btn span {
+        display: none;
+    }
+
+    .user-btn .ph-caret-down {
+        display: none;
+    }
+
+    /* Page header */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+
+    .stat-card {
+        padding: var(--spacing-md);
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-icon i {
+        font-size: 1.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    /* Quick actions */
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .action-btn {
+        padding: var(--spacing-md);
+    }
+
+    .action-btn i {
+        font-size: 1.25rem;
+    }
+
+    .action-btn span {
+        font-size: 0.75rem;
+    }
+
+    /* Attendance summary */
+    .attendance-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .summary-item {
+        padding: var(--spacing-sm);
+    }
+
+    .summary-item i {
+        font-size: 1.25rem;
+    }
+
+    .summary-value {
+        font-size: 1.25rem;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.8rem;
+    }
+
+    .btn-block-mobile {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Form adjustments */
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    /* Date selector */
+    .date-selector {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .date-input {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    /* Filter row */
+    .filter-row {
+        flex-direction: column;
+    }
+
+    .filter-row .date-range {
+        width: 100%;
+    }
+
+    /* Tabs - horizontal scroll */
+    .tabs {
+        margin-left: calc(var(--spacing-md) * -1);
+        margin-right: calc(var(--spacing-md) * -1);
+        padding-left: var(--spacing-md);
+        padding-right: var(--spacing-md);
+    }
+
+    .tab {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.8rem;
+    }
+
+    .tab i {
+        font-size: 1rem;
+    }
+
+    /* Modal full width */
+    .modal {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .modal-container {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    /* Toast notifications */
+    .toast-container {
+        left: var(--spacing-sm);
+        right: var(--spacing-sm);
+        max-width: 100%;
+    }
+
+    /* Movement cards */
+    .movement-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .movement-badges {
+        align-self: flex-start;
+    }
+
+    /* Checkpoint grid */
+    .checkpoint-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Settings */
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .setting-input {
+        width: 100%;
+    }
+
+    /* Charts */
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        height: 160px;
+    }
+
+    /* Report selector */
+    .report-selector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .date-range {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .date-range .date-input {
+        width: 100%;
+    }
+
+    /* Offline badge */
+    .offline-badge {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .offline-badge i {
+        font-size: 0.75rem;
+    }
+}
+
+/* ----- Small Devices (tablets, 481px - 768px) ----- */
+@media (min-width: 481px) and (max-width: 768px) {
+
+    /* Stats grid */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Quick actions */
+    .quick-actions {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Charts */
+    .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Attendance summary */
+    .attendance-summary {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Training/Leave lists */
+    .training-list,
+    .leave-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Equipment grid */
+    .equipment-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Checkpoint grid */
+    .checkpoint-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Modal */
+    .modal {
+        max-width: 80%;
+    }
+}
+
+/* ----- Medium Devices (small laptops, 769px - 1023px) ----- */
+@media (min-width: 769px) and (max-width: 1023px) {
+
+    /* Sidebar remains hidden, use hamburger menu */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding-bottom: calc(var(--bottom-nav-height) + var(--spacing-md));
+    }
+
+    #menu-toggle {
+        display: flex;
+    }
+
+    .bottom-nav {
+        display: flex;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Training/Leave lists */
+    .training-list,
+    .leave-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Equipment grid */
+    .equipment-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ----- Large Devices (desktops, 1024px+) ----- */
+@media (min-width: 1024px) {
+
+    /* Sidebar always visible */
+    .sidebar {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding-bottom: var(--spacing-md);
+    }
+
+    #menu-toggle {
+        display: none;
+    }
+
+    .bottom-nav {
+        display: none;
+    }
+
+    #sidebar-close {
+        display: none;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Dashboard grid */
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Charts */
+    .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Training/Leave lists */
+    .training-list,
+    .leave-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Equipment grid */
+    .equipment-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Checkpoint grid */
+    .checkpoint-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ----- Extra Large Devices (large desktops, 1440px+) ----- */
+@media (min-width: 1440px) {
+    .main-content {
+        max-width: 1400px;
+        margin-left: var(--sidebar-width);
+        margin-right: auto;
+    }
+
+    /* Training/Leave lists */
+    .training-list,
+    .leave-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Equipment grid */
+    .equipment-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    /* Checkpoint grid */
+    .checkpoint-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* =====================================================
+   Touch-Friendly Enhancements
+   ===================================================== */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Larger touch targets */
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .icon-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .nav-item {
+        min-height: 48px;
+    }
+
+    .bottom-nav-item {
+        padding: var(--spacing-sm) var(--spacing-xs);
+    }
+
+    .tab {
+        min-height: 44px;
+    }
+
+    .data-card {
+        padding: var(--spacing-lg);
+    }
+
+    /* Remove hover effects for touch devices */
+    .stat-card:hover,
+    .data-card:hover,
+    .training-card:hover,
+    .leave-card:hover,
+    .equipment-card:hover,
+    .movement-card:hover,
+    .checkpoint-card:hover {
+        transform: none;
+    }
+
+    /* Touch feedback */
+    .btn:active,
+    .icon-btn:active,
+    .nav-item:active,
+    .tab:active,
+    .action-btn:active {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+
+    /* Larger form inputs */
+    .form-input,
+    .form-select,
+    .form-textarea,
+    .filter-select,
+    .date-input {
+        min-height: 48px;
+        font-size: 16px;
+        /* Prevent zoom on iOS */
+    }
+
+    /* Larger checkboxes */
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* =====================================================
+   Landscape Mode Adjustments
+   ===================================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+    .header {
+        height: 50px;
+    }
+
+    .main-content {
+        margin-top: 50px;
+    }
+
+    .bottom-nav {
+        height: 56px;
+    }
+
+    .main-content {
+        padding-bottom: calc(56px + var(--spacing-sm));
+    }
+
+    /* Reduce padding in landscape */
+    .stat-card,
+    .data-card,
+    .training-card,
+    .leave-card,
+    .equipment-card {
+        padding: var(--spacing-sm);
+    }
+
+    /* Modal adjustments */
+    .modal {
+        max-height: 95vh;
+    }
+
+    .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+}
+
+/* =====================================================
+   Safe Area Insets (Notch Support)
+   ===================================================== */
+@supports (padding: max(0px)) {
+    .header {
+        padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+        padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+        padding-top: max(0px, env(safe-area-inset-top));
+    }
+
+    .bottom-nav {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+        height: calc(var(--bottom-nav-height) + max(0px, env(safe-area-inset-bottom)));
+    }
+
+    .main-content {
+        padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+        padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+    }
+
+    .sidebar-content {
+        padding-left: max(0px, env(safe-area-inset-left));
+    }
+
+    .toast-container {
+        bottom: calc(var(--bottom-nav-height) + var(--spacing-md) + max(0px, env(safe-area-inset-bottom)));
+    }
+
+    @media (min-width: 1024px) {
+        .toast-container {
+            bottom: calc(var(--spacing-md) + max(0px, env(safe-area-inset-bottom)));
+        }
+    }
+}
+
+/* =====================================================
+   Dark Mode Optimization
+   ===================================================== */
+@media (prefers-color-scheme: dark) {
+    /* Already using dark theme by default */
+}
+
+/* =====================================================
+   Reduced Motion (Accessibility)
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .loading-spinner {
+        animation: none;
+    }
+}
+
+/* =====================================================
+   High Contrast Mode
+   ===================================================== */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #666666;
+        --border-light: #888888;
+    }
+
+    .btn-primary,
+    .btn-success,
+    .btn-warning,
+    .btn-danger {
+        border: 2px solid currentColor;
+    }
+
+    .badge {
+        border: 1px solid currentColor;
+    }
+}

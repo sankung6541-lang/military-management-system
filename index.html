@@ -1010,15 +1010,55 @@
                         <i class="ph ph-users-three"></i>
                         จัดการผู้ใช้
                     </h1>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="auth.syncUsersFromSheets()"
+                            title="ดึงข้อมูลจาก Google Sheets">
+                            <i class="ph ph-cloud-arrow-down"></i>
+                            ดึงจาก Sheets
+                        </button>
+                        <button class="btn btn-primary" onclick="auth.syncUsersToSheets()"
+                            title="อัพโหลดไป Google Sheets">
+                            <i class="ph ph-cloud-arrow-up"></i>
+                            อัพโหลด
+                        </button>
+                    </div>
                 </div>
 
                 <div class="users-container">
                     <div class="section">
-                        <div class="section-header">
-                            <h2 class="section-title">รายชื่อผู้ใช้งาน</h2>
+                        <div class="section-header"
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h2 class="section-title" style="margin-bottom: 0; border-bottom: none;">
+                                <i class="ph ph-list"></i>
+                                รายชื่อผู้ใช้งาน
+                            </h2>
+                            <span id="users-count" class="badge badge-info">0 คน</span>
                         </div>
                         <div id="users-list" class="users-list">
                             <!-- Users will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Tips Section -->
+                    <div class="section" style="margin-top: 1.5rem;">
+                        <div class="settings-group"
+                            style="background: rgba(59, 130, 246, 0.1); border-color: var(--color-info);">
+                            <h2 class="settings-group-title" style="color: var(--color-info);">
+                                <i class="ph ph-lightbulb"></i>
+                                วิธีจัดการผู้ใช้ผ่าน Google Sheets
+                            </h2>
+                            <div style="padding: 0.5rem 0; color: var(--text-secondary); font-size: 0.9rem;">
+                                <ol style="padding-left: 1.5rem; margin: 0;">
+                                    <li style="margin-bottom: 0.5rem;">เปิด Google Sheets ที่เชื่อมต่อ แล้วไปที่ Sheet
+                                        "ผู้ใช้งาน"</li>
+                                    <li style="margin-bottom: 0.5rem;">แก้ไขข้อมูลผู้ใช้ตามต้องการ (role, displayName
+                                        ฯลฯ)</li>
+                                    <li style="margin-bottom: 0.5rem;">กดปุ่ม <strong>"ดึงจาก Sheets"</strong>
+                                        เพื่อดึงข้อมูลมาใช้งาน</li>
+                                    <li>หรือกดปุ่ม <strong>"อัพโหลด"</strong> เพื่อส่งข้อมูลผู้ใช้ในเครื่องไปเก็บใน
+                                        Sheets</li>
+                                </ol>
+                            </div>
                         </div>
                     </div>
                 </div>
